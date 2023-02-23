@@ -81,8 +81,10 @@ def authentik_user_agent() -> str:
     return f"authentik@{get_full_version()}"
 
 
-def get_http_session() -> Session:
+def get_http_session(**kwargs) -> Session:
     """Get a requests session with common headers"""
     session = Session()
+    for key, value in kwargs.items():
+        setattr(session, key, value)
     session.headers["User-Agent"] = authentik_user_agent()
     return session

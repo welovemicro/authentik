@@ -210,6 +210,7 @@ export class IdentificationStage extends BaseStage<
                 <input
                     type=${type}
                     name="uidField"
+                    id="uidField"
                     placeholder=${label}
                     autofocus=""
                     autocomplete="username"

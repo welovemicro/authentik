@@ -8,7 +8,14 @@
 <link rel="icon" href="{{ tenant.branding_favicon }}">
 <link rel="shortcut icon" href="{{ tenant.branding_favicon }}">
 {% if flow.compatibility_mode and not inspector %}
-<script>ShadyDOM = { force: !navigator.webdriver };</script>
+<script>
+ShadyDOM = { force: true };
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelector = document.__shady_native_querySelector;
+  document.querySelectorAll = document.__shady_native_querySelectorAll;
+  document.getElementById = document.__shady_native_getElementById;
+});
+</script>
 {% endif %}
 {% include "base/header_js.html" %}
 <script>

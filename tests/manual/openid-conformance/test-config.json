@@ -16,5 +16,36 @@
         "client_id": "ad64aeaf1efe388ecf4d28fcc537e8de08bcae26",
         "client_secret": "ff2e34a5b04c99acaf7241e25a950e7f6134c86936923d8c698d8f38bd57647750d661069612c0ee55045e29fe06aa101804bdae38e8360647d595e771fea789"
     },
-    "consent": {}
+    "consent": {},
+    "browser": [
+        {
+            "match": "http://host.docker.internal:9000/application/o/authorize*",
+            "tasks": [
+                {
+                    "task": "Login",
+                    "optional": true,
+                    "match": "http://host.docker.internal:9000/if/flow/default-authentication-flow*",
+                    "commands": [
+                        [
+                            "text",
+                            "css",
+                            "[name=uidField]",
+                            "akadmin"
+                        ],
+                        [
+                            "text",
+                            "css",
+                            "[name=password]",
+                            "foo"
+                        ],
+                        [
+                            "click",
+                            "css",
+                            "button"
+                        ]
+                    ]
+                }
+            ]
+        }
+    ]
 }
