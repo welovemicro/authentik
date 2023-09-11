@@ -110,8 +110,8 @@ disable_startup_analytics: false
 avatars: env://AUTHENTIK_AUTHENTIK__AVATARS?gravatar,initials
 events:
   context_processors:
-    geoip: "/geoip/GeoLite2-City.mmdb"
-    asn: "/geoip/GeoLite2-ASN.mmdb"
+    geoip: "/ak-root/geoip/GeoLite2-City.mmdb"
+    asn: "/ak-root/geoip/GeoLite2-ASN.mmdb"
 
 footer_links: []
 
