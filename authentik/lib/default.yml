@@ -57,7 +57,7 @@ paths:
   media: /data/media
   cert_discovery: /data/certs
   email_templates: /data/email-templates
-  blueprints: /data/blueprints
+  blueprints: /ak-root/blueprints
 
 debug: false
 remote_debug: false

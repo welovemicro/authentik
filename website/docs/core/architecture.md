@@ -29,7 +29,7 @@ Similar to [other outposts](../outposts/index.mdx), this outpost allows using [P
 
 #### Persistence
 
--   `/media` is used to store icons and such, but not required, and if not mounted, authentik will allow you to set a URL to icons in place of a file upload
+-   `/data/media` is used to store icons and such, but not required, and if not mounted, authentik will allow you to set a URL to icons in place of a file upload
 
 ### Background Worker
 
@@ -37,8 +37,8 @@ This container executes background tasks, such as sending emails, the event noti
 
 #### Persistence
 
--   `/certs` is used for authentik to import external certs, which in most cases shouldn't be used for SAML, but rather if you use authentik without a reverse proxy, this can be used for example for the [Let's Encrypt integration](../core/certificates.md#lets-encrypt)
--   `/templates` is used for [custom email templates](../flow/stages/email/index.mdx#custom-templates), and as with the other ones fully optional
+-   `/data/certs` is used for authentik to import external certs, which in most cases shouldn't be used for SAML, but rather if you use authentik without a reverse proxy, this can be used for example for the [Let's Encrypt integration](../core/certificates.md#lets-encrypt)
+-   `/data/email-templates` is used for [custom email templates](../flow/stages/email/index.mdx#custom-templates), and as with the other ones fully optional
 
 ### PostgreSQL
 

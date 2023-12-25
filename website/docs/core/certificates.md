@@ -24,9 +24,9 @@ For SAML use-cases, you can generate a Certificate that's valid for longer than 
 
 To use externally managed certificates, for example generated with certbot or HashiCorp Vault, you can use the discovery feature.
 
-The docker-compose installation maps a `certs` directory to `/certs`, you can simply use this as an output directory for certbot.
+The docker-compose installation maps a `certs` directory to `/data/certs`, you can simply use this as an output directory for certbot.
 
-For Kubernetes, you can map custom secrets/volumes under `/certs`.
+For Kubernetes, you can map custom secrets/volumes under `/data/certs`.
 
 You can also bind mount single files into the folder, as long as they fall under this naming schema.
 
@@ -62,9 +62,9 @@ Files are checked every 5 minutes, and will trigger an Outpost refresh if the fi
 Starting with authentik 2022.9, you can also import certificates with any folder structure directly. To do this, run the following command within the worker container:
 
 ```shell
-ak import_certificate --certificate /certs/mycert.pem --private-key /certs/something.pem --name test
+ak import_certificate --certificate /data/certs/mycert.pem --private-key /data/certs/something.pem --name test
 # --private-key can be omitted to only import a certificate, i.e. to trust other connections
-# ak import_certificate --certificate /certs/othercert.pem --name test2
+# ak import_certificate --certificate /data/certs/othercert.pem --name test2
 ```
 
 This will import the certificate into authentik under the given name. This command is idempotent, meaning you can run it via a cron-job and authentik will only update the certificate when it changes.
@@ -84,7 +84,7 @@ services:
     certbot:
         image: certbot/dns-route53:v1.22.0
         volumes:
-            - ./certs/:/etc/letsencrypt
+            - ./data/certs/:/etc/letsencrypt
         # Variables depending on DNS Plugin
         environment:
             AWS_ACCESS_KEY_ID: ...

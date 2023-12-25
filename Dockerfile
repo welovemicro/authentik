@@ -132,6 +132,8 @@ RUN apt-get update && \
     rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/ && \
     adduser --system --no-create-home --uid 1000 --group --home /authentik authentik && \
     mkdir -p /data/certs /data/media /data/blueprints && \
+    mkdir -p /ak-root/blueprints && \
+    ln -s /data/blueprints /ak-root/blueprints/local && \
     mkdir -p /authentik/.ssh && \
     mkdir -p /ak-root && \
     chown authentik:authentik /data/certs /data/media /authentik/.ssh /ak-root
@@ -143,7 +145,7 @@ COPY ./schemas /ak-root/schemas
 COPY ./locale /ak-root/locale
 COPY ./tests /ak-root/tests
 COPY ./manage.py /ak-root/
-COPY ./blueprints /data/blueprints
+COPY ./blueprints /ak-root/blueprints
 COPY ./lifecycle/ /ak-root/lifecycle
 COPY --from=go-builder /go/authentik /bin/authentik
 COPY --from=python-deps /ak-root/venv /ak-root/venv
