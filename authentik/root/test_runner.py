@@ -34,7 +34,7 @@ class PytestTestRunner(DiscoverRunner):  # pragma: no cover
         CONFIG.set("avatars", "none")
         CONFIG.set("events.context_processors.geoip", "tests/GeoLite2-City-Test.mmdb")
         CONFIG.set("events.context_processors.asn", "tests/GeoLite2-ASN-Test.mmdb")
-        CONFIG.set("blueprints_dir", "./blueprints")
+        CONFIG.set("paths.blueprints", "./blueprints")
         CONFIG.set(
             "outposts.container_image_base",
             f"ghcr.io/goauthentik/dev-%(type)s:{get_docker_tag()}",

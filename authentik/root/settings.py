@@ -237,7 +237,7 @@ ROOT_URLCONF = "authentik.root.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [CONFIG.get("email.template_dir")],
+        "DIRS": [CONFIG.get("paths.email_templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

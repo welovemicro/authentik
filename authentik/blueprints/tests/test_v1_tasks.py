@@ -16,7 +16,7 @@ TMP = mkdtemp("authentik-blueprints")
 class TestBlueprintsV1Tasks(TransactionTestCase):
     """Test Blueprints v1 Tasks"""
 
-    @CONFIG.patch("blueprints_dir", TMP)
+    @CONFIG.patch("paths.blueprints", TMP)
     def test_invalid_file_syntax(self):
         """Test syntactically invalid file"""
         with NamedTemporaryFile(suffix=".yaml", dir=TMP) as file:
@@ -25,7 +25,7 @@ class TestBlueprintsV1Tasks(TransactionTestCase):
             blueprints = blueprints_find()
             self.assertEqual(blueprints, [])
 
-    @CONFIG.patch("blueprints_dir", TMP)
+    @CONFIG.patch("paths.blueprints", TMP)
     def test_invalid_file_version(self):
         """Test invalid file"""
         with NamedTemporaryFile(suffix=".yaml", dir=TMP) as file:
@@ -34,7 +34,7 @@ class TestBlueprintsV1Tasks(TransactionTestCase):
             blueprints = blueprints_find()
             self.assertEqual(blueprints, [])
 
-    @CONFIG.patch("blueprints_dir", TMP)
+    @CONFIG.patch("paths.blueprints", TMP)
     def test_valid(self):
         """Test valid file"""
         blueprint_id = generate_id()
@@ -64,7 +64,7 @@ class TestBlueprintsV1Tasks(TransactionTestCase):
                 },
             )
 
-    @CONFIG.patch("blueprints_dir", TMP)
+    @CONFIG.patch("paths.blueprints", TMP)
     def test_valid_updated(self):
         """Test valid file"""
         BlueprintInstance.objects.filter(name="foo").delete()
@@ -123,7 +123,7 @@ class TestBlueprintsV1Tasks(TransactionTestCase):
                 },
             )
 
-    @CONFIG.patch("blueprints_dir", TMP)
+    @CONFIG.patch("paths.blueprints", TMP)
     def test_valid_disabled(self):
         """Test valid file"""
         with NamedTemporaryFile(mode="w+", suffix=".yaml", dir=TMP) as file:

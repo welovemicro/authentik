@@ -265,7 +265,7 @@ class TestCrypto(APITestCase):
                 _cert.write(builder.certificate)
             with open(f"{temp_dir}/foo.bar/privkey.pem", "w+", encoding="utf-8") as _key:
                 _key.write(builder.private_key)
-            with CONFIG.patch("cert_discovery_dir", temp_dir):
+            with CONFIG.patch("path.cert_discovery", temp_dir):
                 certificate_discovery()  # pylint: disable=no-value-for-parameter
         keypair: CertificateKeyPair = CertificateKeyPair.objects.filter(
             managed=MANAGED_DISCOVERED % "foo"

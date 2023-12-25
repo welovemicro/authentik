@@ -19,7 +19,7 @@ class TestBlueprintsV1API(APITestCase):
         self.user = create_test_admin_user()
         self.client.force_login(self.user)
 
-    @CONFIG.patch("blueprints_dir", TMP)
+    @CONFIG.patch("paths.blueprints", TMP)
     def test_api_available(self):
         """Test valid file"""
         with NamedTemporaryFile(mode="w+", suffix=".yaml", dir=TMP) as file:

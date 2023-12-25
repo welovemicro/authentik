@@ -54,7 +54,10 @@ cache:
   # url: ""
 
 paths:
-  media: ./media
+  media: /data/media
+  cert_discovery: /data/certs
+  email_templates: /data/email-templates
+  blueprints: /data/blueprints
 
 debug: false
 remote_debug: false
@@ -78,7 +81,6 @@ email:
   use_ssl: false
   timeout: 10
   from: authentik@localhost
-  template_dir: /templates
 
 throttle:
   providers:
@@ -110,8 +112,8 @@ disable_startup_analytics: false
 avatars: env://AUTHENTIK_AUTHENTIK__AVATARS?gravatar,initials
 events:
   context_processors:
-    geoip: "/ak-root/geoip/GeoLite2-City.mmdb"
-    asn: "/ak-root/geoip/GeoLite2-ASN.mmdb"
+    geoip: "/data/geoip/GeoLite2-City.mmdb"
+    asn: "/data/geoip/GeoLite2-ASN.mmdb"
 
 footer_links: []
 
@@ -120,11 +122,8 @@ default_user_change_email: false
 default_user_change_username: false
 
 gdpr_compliance: true
-cert_discovery_dir: /certs
 default_token_length: 60
 impersonation: true
-
-blueprints_dir: /blueprints
 
 web:
   # No default here as it's set dynamically
