@@ -15,7 +15,6 @@ with open("local.env.yml", "w", encoding="utf-8") as _config:
             "outposts": {
                 "container_image_base": "ghcr.io/goauthentik/dev-%(type)s:gh-%(build_hash)s",
             },
-            "paths.blueprints": "./blueprints",
             "paths": {
                 "cert_discovery": "./data/certs",
                 "media": "./data/media",
@@ -23,7 +22,7 @@ with open("local.env.yml", "w", encoding="utf-8") as _config:
                 "blueprints": "./blueprints",
             },
             "events": {
-                "processors": {
+                "context_processors": {
                     "geoip": "tests/GeoLite2-City-Test.mmdb",
                     "asn": "tests/GeoLite2-ASN-Test.mmdb",
                 }

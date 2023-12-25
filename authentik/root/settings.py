@@ -17,7 +17,9 @@ from authentik.stages.password import BACKEND_APP_PASSWORD, BACKEND_INBUILT, BAC
 
 BASE_DIR = Path(__file__).absolute().parent.parent.parent
 STATICFILES_DIRS = [BASE_DIR / Path("web")]
-MEDIA_ROOT = BASE_DIR / Path("media")
+MEDIA_ROOT = Path(CONFIG.get("paths.media"))
+if not MEDIA_ROOT.exists():
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
 DEBUG = CONFIG.get_bool("debug")
 SECRET_KEY = CONFIG.get("secret_key")
