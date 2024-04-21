@@ -175,7 +175,7 @@ REST_FRAMEWORK = {
         "authentik.rbac.filters.ObjectFilter",
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.OrderingFilter",
-        "authentik.api.search.QLSearch",
+        "rest_framework.filters.SearchFilter",
     ],
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
