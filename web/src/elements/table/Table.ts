@@ -35,7 +35,7 @@ export interface TableLike {
 
 export interface PaginatedResponse<T> {
     pagination: Pagination;
-    autocomplete: {
+    autocomplete?: {
         [key: string]: unknown;
     };
 
