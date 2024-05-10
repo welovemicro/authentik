@@ -20,6 +20,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
 from authentik.admin.api.metrics import CoordinateSerializer
+from authentik.api.pagination import AutocompletePagination
 from authentik.api.search import ChoiceSearchField, JSONSearchField, QLSearch
 from authentik.core.api.utils import PassiveSerializer, TypeCreateSerializer
 from authentik.events.models import Event, EventAction
@@ -121,6 +122,7 @@ class EventViewSet(ModelViewSet):
     filter_backends = [
         QLSearch,
     ]
+    pagination_class = AutocompletePagination
 
     @extend_schema(
         methods=["GET"],
