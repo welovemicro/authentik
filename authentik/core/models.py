@@ -824,9 +824,9 @@ class AuthenticatedSession(ExpiringModel):
 
         if not hasattr(request, "session") or not request.session.session_key:
             return None
-        AuthenticatedSession.objects.filter(session_key=session_key).update(
+        AuthenticatedSession.objects.filter(session_key=request.session.session_key).update(
             user=user,
             last_ip=ClientIPMiddleware.get_client_ip(request),
             last_user_agent=request.META.get("HTTP_USER_AGENT", ""),
         )
-        return AuthenticatedSession.objects.filter(session_key=session_key).first()
+        return AuthenticatedSession.objects.filter(session_key=request.session.session_key).first()

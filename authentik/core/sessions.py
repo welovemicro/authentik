@@ -1,12 +1,6 @@
-import logging
-
-from asgiref.sync import sync_to_async
-from django.contrib.session.backends.db import SessionStore as BaseSessionStore
-from django.contrib.sessions.backends.base import CreateError, SessionBase, UpdateError
+from django.contrib.sessions.backends.db import SessionStore as BaseSessionStore
 from django.core.exceptions import SuspiciousOperation
-from django.db import DatabaseError, IntegrityError, router, transaction
 from django.utils import timezone
-from django.utils.functional import cached_property
 from structlog import get_logger
 
 LOGGER = get_logger()
@@ -24,7 +18,7 @@ class SessionStore(BaseSessionStore):
             return self.model.objects.get(session_key=self.session_key, expires__gt=timezone.now())
         except (self.model.DoesNotExist, SuspiciousOperation) as exc:
             if isinstance(exc, SuspiciousOperation):
-                LOGGER.warning(str(e))
+                LOGGER.warning(str(exc))
             self._session_key = None
 
     async def _aget_session_from_db(self):
@@ -32,7 +26,7 @@ class SessionStore(BaseSessionStore):
             return self.model.objects.aget(session_key=self.session_key, expires__gt=timezone.now())
         except (self.model.DoesNotExist, SuspiciousOperation) as exc:
             if isinstance(exc, SuspiciousOperation):
-                LOGGER.warning(str(e))
+                LOGGER.warning(str(exc))
             self._session_key = None
 
     def create_model_instance(self, data):

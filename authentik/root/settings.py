@@ -7,7 +7,6 @@ from hashlib import sha512
 from pathlib import Path
 
 from celery.schedules import crontab
-from django.conf import ImproperlyConfigured
 from sentry_sdk import set_tag
 
 from authentik import ENV_GIT_HASH_KEY, __version__
