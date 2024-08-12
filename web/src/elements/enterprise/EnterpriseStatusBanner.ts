@@ -19,8 +19,11 @@ export class EnterpriseStatusBanner extends WithLicenseSummary(AKElement) {
     }
 
     renderStatusBanner() {
+        if (!this.licenseSummary) {
+            return nothing;
+        }
         // Check if we're in the correct interface to render a banner
-        switch (this.licenseSummary.status) {
+        switch (this.licenseSummary?.status) {
             // user warning is both on admin interface and user interface
             case LicenseSummaryStatusEnum.LimitExceededUser:
                 if (
@@ -37,6 +40,7 @@ export class EnterpriseStatusBanner extends WithLicenseSummary(AKElement) {
                     return nothing;
                 }
                 break;
+            case LicenseSummaryStatusEnum.Unlicensed:
             case LicenseSummaryStatusEnum.Valid:
                 return nothing;
             case LicenseSummaryStatusEnum.ReadOnly:
@@ -44,7 +48,7 @@ export class EnterpriseStatusBanner extends WithLicenseSummary(AKElement) {
                 break;
         }
         let message = "";
-        switch (this.licenseSummary.status) {
+        switch (this.licenseSummary?.status) {
             case LicenseSummaryStatusEnum.LimitExceededAdmin:
             case LicenseSummaryStatusEnum.LimitExceededUser:
                 message = msg(
@@ -78,14 +82,17 @@ export class EnterpriseStatusBanner extends WithLicenseSummary(AKElement) {
         </div>`;
     }
 
-    renderFlagBanner(): TemplateResult {
+    renderFlagBanner() {
+        if (!this.licenseSummary) {
+            return nothing;
+        }
         return html`
-            ${this.licenseSummary.licenseFlags.includes(LicenseFlagsEnum.Trial)
+            ${this.licenseSummary?.licenseFlags.includes(LicenseFlagsEnum.Trial)
                 ? html`<div class="pf-c-banner pf-m-sticky pf-m-gold">
                       ${msg("This authentik instance uses a Trial license.")}
                   </div>`
                 : nothing}
-            ${this.licenseSummary.licenseFlags.includes(LicenseFlagsEnum.NonProduction)
+            ${this.licenseSummary?.licenseFlags.includes(LicenseFlagsEnum.NonProduction)
                 ? html`<div class="pf-c-banner pf-m-sticky pf-m-gold">
                       ${msg("This authentik instance uses a Non-production license.")}
                   </div>`
