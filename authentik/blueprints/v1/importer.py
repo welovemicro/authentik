@@ -13,6 +13,7 @@ from django.db.models import Model
 from django.db.models.query_utils import Q
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
+from guardian.shortcuts import assign_perm
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import BaseSerializer, Serializer
 from structlog.stdlib import BoundLogger, get_logger
@@ -27,11 +28,14 @@ from authentik.blueprints.v1.common import (
     EntryInvalidError,
 )
 from authentik.blueprints.v1.meta.registry import BaseMetaModel, registry
+from authentik.core.models import User
 from authentik.enterprise.license import LicenseKey
 from authentik.events.logs import LogEvent, capture_logs
 from authentik.events.utils import cleanse_dict
 from authentik.lib.models import SerializerModel, excluded_models
 from authentik.lib.sentry import SentryIgnoredException
+from authentik.lib.utils.reflection import get_apps
+from authentik.rbac.models import Role
 
 # Context set when the serializer is created in a blueprint context
 # Update website/developer-docs/blueprints/v1/models.md when used
@@ -58,6 +62,16 @@ def transaction_rollback():
         pass
 
 
+def rbac_models() -> dict:
+    models = {}
+    for app in get_apps():
+        for model in app.get_models():
+            if not is_model_allowed(model):
+                continue
+            models[model._meta.model_name] = app.label
+    return models
+
+
 class Importer:
     """Import Blueprint from raw dict or YAML/JSON"""
 
@@ -76,7 +90,10 @@ class Importer:
 
     def default_context(self):
         """Default context"""
-        return {"goauthentik.io/enterprise/licensed": LicenseKey.get_total().is_valid()}
+        return {
+            "goauthentik.io/enterprise/licensed": LicenseKey.get_total().status().is_valid,
+            "goauthentik.io/rbac/models": rbac_models(),
+        }
 
     @staticmethod
     def from_string(yaml_input: str, context: dict | None = None) -> "Importer":
@@ -136,14 +153,17 @@ class Importer:
 
         return main_query | sub_query
 
-    def _validate_single(self, entry: BlueprintEntry) -> BaseSerializer | None:
+    def _validate_single(self, entry: BlueprintEntry) -> BaseSerializer | None:  # noqa: PLR0915
         """Validate a single entry"""
         if not entry.check_all_conditions_match(self._import):
             self.logger.debug("One or more conditions of this entry are not fulfilled, skipping")
             return None
 
         model_app_label, model_name = entry.get_model(self._import).split(".")
-        model: type[SerializerModel] = registry.get_model(model_app_label, model_name)
+        try:
+            model: type[SerializerModel] = registry.get_model(model_app_label, model_name)
+        except LookupError as exc:
+            raise EntryInvalidError.from_entry(exc, entry) from exc
         # Don't use isinstance since we don't want to check for inheritance
         if not is_model_allowed(model):
             raise EntryInvalidError.from_entry(f"Model {model} not allowed", entry)
@@ -218,10 +238,7 @@ class Importer:
         try:
             full_data = self.__update_pks_for_attrs(entry.get_attrs(self._import))
         except ValueError as exc:
-            raise EntryInvalidError.from_entry(
-                exc,
-                entry,
-            ) from exc
+            raise EntryInvalidError.from_entry(exc, entry) from exc
         always_merger.merge(full_data, updated_identifiers)
         serializer_kwargs["data"] = full_data
 
@@ -241,6 +258,15 @@ class Importer:
                 serializer=serializer,
             ) from exc
         return serializer
+
+    def _apply_permissions(self, instance: Model, entry: BlueprintEntry):
+        """Apply object-level permissions for an entry"""
+        for perm in entry.get_permissions(self._import):
+            if perm.user is not None:
+                assign_perm(perm.permission, User.objects.get(pk=perm.user), instance)
+            if perm.role is not None:
+                role = Role.objects.get(pk=perm.role)
+                role.assign_permission(perm.permission, obj=instance)
 
     def apply(self) -> bool:
         """Apply (create/update) models yaml, in database transaction"""
@@ -306,6 +332,7 @@ class Importer:
                 if "pk" in entry.identifiers:
                     self.__pk_map[entry.identifiers["pk"]] = instance.pk
                 entry._state = BlueprintEntryState(instance)
+                self._apply_permissions(instance, entry)
             elif state == BlueprintEntryDesiredState.ABSENT:
                 instance: Model | None = serializer.instance
                 if instance.pk:
