@@ -24,15 +24,15 @@ The authentik worker is a stateless component that processes background tasks fo
 -   synchronization tasks for sources and providers such as SCIM, Google Workspace, LDAP, etc.
 -   one-off tasks that are triggered by some action by a user or an administrator, such as sending notifications.
 
-Scaling the worker thus greatly depends on the usage made of authentik. If not synchronization is configured and there are few one-off tasks, then the worker will practically use next to no resources. However, if the worker has to process lengthy synchronization tasks and is then backlogged with other tasks, then it needs to be scaled up.
+Scaling the worker thus greatly depends on the usage made of authentik. If not synchronization is configured and there are few one-off tasks, then the worker will use almost no resources. However, if the worker has to process lengthy synchronization tasks and is then backlogged with other tasks, then it needs to be scaled up.
 
-As such, we recommend setting up some [monitoring](./monitoring.md) and observing how the worker behaves and scaling it up accordingly. You should aim to have a few tasks as possible in the worker queue.
+As such, we recommend setting up some [monitoring](./monitoring.md) and observing how the worker behaves, then scaling it up accordingly. You should aim to have as few tasks as possible in the worker queue.
 
 ### PostgreSQL & Redis
 
-We recommend looking into both tools respective documentation to get pointers on how to monitor those.
+We recommend looking into both tools' respective documentation to get pointers on how to monitor them.
 
-The specific usage that authentik makes of those doesn't scale linearly, but rather logarithmically.
+The specific usage that authentik makes of PostgreSQL and Redis doesn't scale linearly, but rather logarithmically.
 
 ## Calculator
 
