@@ -214,7 +214,7 @@ export default class ScalingCalculator extends React.Component {
     render() {
         return (
             <>
-                <form className="row">
+                <form className="row" autoComplete="off">
                     <label className={"col col--6 margin-vert--md"}>
                         Number of users
                     </label>
