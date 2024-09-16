@@ -4,17 +4,46 @@ import React from "react";
 const estimateLogins = (users: number) => Math.ceil(users / 15.0 / 60.0) * 10;
 
 export default class ScalingCalculator extends React.Component {
+    state: {
+        users: number;
+        logins: number;
+        loginsManuallyUpdated: boolean;
+        recommendation?: {
+            setups: {
+                id: string;
+                platform: string;
+                replicas: number;
+                requests_cpu: number;
+                requests_memory: number;
+                gunicorn_workers: number;
+                gunicorn_threads: number;
+            }[];
+            postgres: {
+                cpus: number;
+                ram: number;
+                storage_gb: number;
+            };
+            redis: {
+                cpus: number;
+                ram: number;
+            };
+        };
+    } = {
+        users: 10,
+        logins: 0,
+        loginsManuallyUpdated: false,
+        recommendation: undefined,
+    };
+
     constructor(props) {
         super(props);
-        this.state = {
-            users: 0,
-            logins: 0,
-            loginsManuallyUpdated: false,
-            recommendation: null,
-        };
-
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    componentDidMount() {
+        this.updateLogins();
+        this.updateRecommendation();
     }
 
     updateLogins() {
@@ -97,7 +126,7 @@ export default class ScalingCalculator extends React.Component {
 
     renderRecommendation() {
         const recommendation = this.state.recommendation;
-        if (recommendation === null) {
+        if (!recommendation) {
             return <></>;
         }
         return (
@@ -109,7 +138,7 @@ export default class ScalingCalculator extends React.Component {
                         <tr>
                             <th></th>
                             {recommendation.setups.map((s, _) => {
-                                return <th>{s.platform}</th>;
+                                return <th key={s.platform}>{s.platform}</th>;
                             })}
                         </tr>
                     </thead>
@@ -122,23 +151,29 @@ export default class ScalingCalculator extends React.Component {
                             ["memory", "RAM (GB)"],
                             [
                                 "gunicorn_workers",
-                                '<a href="./configuration#authentik_web__workers">Gunicorn Workers</a>',
+                                <a href="./configuration#authentik_web__workers">
+                                    Gunicorn Workers
+                                </a>,
                             ],
                             [
                                 "gunicorn_threads",
-                                '<a href="./configuration#authentik_web__threads">Gunicorn Threads</a>',
+                                <a href="./configuration#authentik_web__threads">
+                                    Gunicorn Threads
+                                </a>,
                             ],
-                        ].map((r, _) => {
+                        ].map(([fieldId, cat]) => {
                             return (
-                                <tr>
-                                    <th
-                                        dangerouslySetInnerHTML={{
-                                            __html: r[1],
-                                        }}
-                                    ></th>
-                                    {recommendation.setups.map((s, _) => {
-                                        if (!(r[0] in s)) return <td>N/A</td>;
-                                        return <td>{s[r[0]]}</td>;
+                                <tr key={fieldId as string}>
+                                    <th>{cat}</th>
+                                    {recommendation.setups.map((setup) => {
+                                        const key = `${fieldId}-${setup.id}`;
+                                        if (!((fieldId as string) in setup))
+                                            return <td key={key}>N/A</td>;
+                                        return (
+                                            <td key={key}>
+                                                {setup[fieldId as string]}
+                                            </td>
+                                        );
                                     })}
                                 </tr>
                             );
@@ -179,27 +214,28 @@ export default class ScalingCalculator extends React.Component {
     render() {
         return (
             <>
-                <form>
-                    <label>
+                <form className="row">
+                    <label className={"col col--6 margin-vert--md"}>
                         Number of users
-                        <input
-                            type="number"
-                            name="users"
-                            value={this.state.users}
-                            onChange={this.handleInputChange}
-                            required
-                        />
                     </label>
-                    <br />
-                    <label>
+                    <input
+                        type="number"
+                        name="users"
+                        value={this.state.users}
+                        onChange={this.handleInputChange}
+                        required
+                        className={"col col--6 margin-vert--md"}
+                    />
+                    <label className={"col col--6 margin-vert--md"}>
                         Number of concurrent logins
-                        <input
-                            type="number"
-                            name="logins"
-                            value={this.state.logins}
-                            onChange={this.handleInputChange}
-                        />
                     </label>
+                    <input
+                        type="number"
+                        name="logins"
+                        value={this.state.logins}
+                        onChange={this.handleInputChange}
+                        className={"col col--6 margin-vert--md"}
+                    />
                 </form>
                 {this.renderRecommendation()}
             </>
