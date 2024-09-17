@@ -38,28 +38,30 @@ export default class ScalingCalculator extends React.Component {
     constructor(props) {
         super(props);
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount() {
-        this.updateLogins();
         this.updateRecommendation();
     }
 
     updateLogins() {
+        console.log("update logins");
         if (this.state.users <= 0) return false;
-        if (this.state.logins <= 0 && !this.state.loginsManuallyUpdated) {
+        if (!this.state.loginsManuallyUpdated) {
             this.setState({
                 ["logins"]: estimateLogins(this.state.users),
             });
         }
+        console.log(this.state.logins);
         return true;
     }
 
     updateRecommendation() {
         if (!this.updateLogins()) return;
 
+        console.log("update recommendation");
         const cpus = Math.max(1, Math.ceil(this.state.logins / 10));
+        console.log(cpus);
 
         const recommendation = {
             setups: [
@@ -108,6 +110,12 @@ export default class ScalingCalculator extends React.Component {
 
     handleInputChange(event) {
         const target = event.target;
+        console.log("input change");
+        if (this.state[target.name] === target.value) {
+            return;
+        }
+        console.log(target.name);
+        console.log(target.value);
         this.setState({
             [target.name]: target.value,
         });
@@ -118,10 +126,6 @@ export default class ScalingCalculator extends React.Component {
         }
 
         this.updateRecommendation();
-    }
-
-    handleSubmit(event) {
-        event.preventDefault();
     }
 
     renderRecommendation() {
