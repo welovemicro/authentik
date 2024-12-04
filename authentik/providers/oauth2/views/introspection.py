@@ -9,7 +9,13 @@ from django.views.decorators.csrf import csrf_exempt
 from structlog.stdlib import get_logger
 
 from authentik.providers.oauth2.errors import TokenIntrospectionError
-from authentik.providers.oauth2.models import AccessToken, IDToken, OAuth2Provider, RefreshToken
+from authentik.providers.oauth2.models import (
+    AccessToken,
+    IDToken,
+    OAuth2Provider,
+    RefreshToken,
+    ClientTypes,
+)
 from authentik.providers.oauth2.utils import TokenResponse, authenticate_provider
 
 LOGGER = get_logger()
@@ -45,16 +51,21 @@ class TokenIntrospectionParams:
         provider = authenticate_provider(request)
         if not provider:
             raise TokenIntrospectionError
+        if not provider.client_type != ClientTypes.CONFIDENTIAL:
+            raise TokenIntrospectionError
 
         # HOTFIX: Revert change made in https://github.com/goauthentik/authentik/pull/11537
         #         which breaks ability to verify a token issued to an SPA being used to
         #         authenticate against a backend API.
+        #         Additionally, implements PR from
+        #         https://github.com/goauthentik/authentik/pull/11617/files to return the
+        #         token's provider instead of the caller's one.
         access_token = AccessToken.objects.filter(token=raw_token).first()
         if access_token:
-            return TokenIntrospectionParams(access_token, provider)
+            return TokenIntrospectionParams(access_token, access_token.provider)
         refresh_token = RefreshToken.objects.filter(token=raw_token).first()
         if refresh_token:
-            return TokenIntrospectionParams(refresh_token, provider)
+            return TokenIntrospectionParams(refresh_token, refresh_token.provider)
         LOGGER.debug("Token does not exist", token=raw_token)
         raise TokenIntrospectionError()
 
