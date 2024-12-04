@@ -46,10 +46,13 @@ class TokenIntrospectionParams:
         if not provider:
             raise TokenIntrospectionError
 
-        access_token = AccessToken.objects.filter(token=raw_token, provider=provider).first()
+        # HOTFIX: Revert change made in https://github.com/goauthentik/authentik/pull/11537
+        #         which breaks ability to verify a token issued to an SPA being used to
+        #         authenticate against a backend API.
+        access_token = AccessToken.objects.filter(token=raw_token).first()
         if access_token:
             return TokenIntrospectionParams(access_token, provider)
-        refresh_token = RefreshToken.objects.filter(token=raw_token, provider=provider).first()
+        refresh_token = RefreshToken.objects.filter(token=raw_token).first()
         if refresh_token:
             return TokenIntrospectionParams(refresh_token, provider)
         LOGGER.debug("Token does not exist", token=raw_token)
