@@ -255,11 +255,14 @@ class OAuthAuthorizationParams:
             LOGGER.warning("Missing 'openid' scope.")
             raise AuthorizeError(self.redirect_uri, "invalid_scope", self.grant_type, self.state)
         if SCOPE_OFFLINE_ACCESS in self.scope:
+            # HOTFIX: Remove forced explicit consent for offline_access because we
+            #         control both the IdP and the Application, and it makes no sense
+            #         to have the user consent to our own app accessing our own user data.
             # https://openid.net/specs/openid-connect-core-1_0.html#OfflineAccess
-            if PROMPT_CONSENT not in self.prompt:
-                # Instead of ignoring the `offline_access` scope when `prompt`
-                # isn't set to `consent`, we set override it ourselves
-                self.prompt.add(PROMPT_CONSENT)
+            # if PROMPT_CONSENT not in self.prompt:
+            #     # Instead of ignoring the `offline_access` scope when `prompt`
+            #     # isn't set to `consent`, we set override it ourselves
+            #     self.prompt.add(PROMPT_CONSENT)
             if self.response_type not in [
                 ResponseTypes.CODE,
                 ResponseTypes.CODE_TOKEN,
