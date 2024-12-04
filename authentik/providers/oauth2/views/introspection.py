@@ -51,8 +51,6 @@ class TokenIntrospectionParams:
         provider = authenticate_provider(request)
         if not provider:
             raise TokenIntrospectionError
-        if not provider.client_type != ClientTypes.CONFIDENTIAL:
-            raise TokenIntrospectionError
 
         # HOTFIX: Revert change made in https://github.com/goauthentik/authentik/pull/11537
         #         which breaks ability to verify a token issued to an SPA being used to
